@@ -9,7 +9,7 @@ include("signalreader.jl")
 
 @views shorten(A::Vector, N::Integer) = A[1:N]
 
-function main()
+function main(;print::Bool=false)
     #fullname =
     #    open_dialog("Pick a PTU file", GtkNullContainer(), ("*.ptu",), select_multiple = false)
     fullname = "/home/lancexwq/Dropbox (ASU)/graphen+DOPC/Graphene+10nmSiO2+DOPC-suv-50nm-atto655_6e5.ptu"
@@ -17,8 +17,7 @@ function main()
 
 
     infile = open(fullname, "r")
-    outfile = nothing
-    #outfile = open(fullname[1:end-4] * ".jlout", "w")
+    print ? outfile = open(fullname[1:end-4] * ".jlout", "w") : outfile = nothing
 
     tagdict = getheader(infile, fullname[1:end-4] * ".header") # TODO change headername
     ist2 = getdatatype(tagdict["TTResultFormat_TTTRRecType"])
