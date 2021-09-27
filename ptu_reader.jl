@@ -9,10 +9,13 @@ include("signalreader.jl")
 
 @views shorten(A::Vector, N::Integer) = A[1:N]
 
-function main(;print::Bool=false)
-    #fullname =
-    #    open_dialog("Pick a PTU file", GtkNullContainer(), ("*.ptu",), select_multiple = false)
-    fullname = "/home/lancexwq/Dropbox (ASU)/graphen+DOPC/Graphene+10nmSiO2+DOPC-suv-50nm-atto655_6e5.ptu"
+function main(fullname::String = ""; print::Bool = false)
+    isempty(fullname) && fullname = open_dialog(
+        "Pick a PTU file",
+        GtkNullContainer(),
+        ("*.ptu",),
+        select_multiple = false,
+    )
     #pathname, filename = rsplit(fullname, "/"; limit = 2)
 
 
@@ -24,16 +27,11 @@ function main(;print::Bool=false)
 
     @printf("\nWriting data to %s", fullname[1:end-4] * ".jlout")
     @printf("\nThis may take a while...")
-    if !isnothing(outfile)
-        if ist2
-            @printf(outfile, "  record# Type Ch        TimeTag             TrueTime/ps\n")
-        else
-            @printf(
-                outfile,
-                "  record# Type Ch        TimeTag             TrueTime/ns            DTime\n"
-            )
-        end
-    end
+    isnothing(outfile) || @printf(
+        outfile,
+        "  record# Type Ch        TimeTag             " * ist2 ? "TrueTime/ps\n" :
+        "TrueTime/ns            DTime\n"
+    )
 
     number_of_records = tagdict["TTResult_NumberOfRecords"]
     rectype = tagdict["TTResultFormat_TTTRRecType"]
@@ -70,4 +68,6 @@ function main(;print::Bool=false)
     return tagdict, cnt, shorten(macrotimes, cnt.ph), shorten(microtimes, cnt.ph)
 end
 
-@time tagdict, cnt, macrotimes, microtimes = main()
+@time tagdict, cnt, macrotimes, microtimes = main(
+    "/home/lancexwq/Dropbox (ASU)/graphen+DOPC/Graphene+10nmSiO2+DOPC-suv-50nm-atto655_6e5.ptu",
+)

@@ -17,13 +17,9 @@ function getheader(infile::IOStream, headername::String)
         tagident = strid(infile, 32)
         tagidx = read(infile, Int32)
         tagtyp = read(infile, UInt32)
-        if tagidx > -1
-            evalname = tagident * "(" * string(tagidx + 1) * ")"
-        else
-            evalname = tagident
-        end
+        evalname = tagident
+        tagidx > -1 && evalname *= "(" * string(tagidx + 1) * ")"
         @printf(headerfile, "\n%-40s", evalname)
-
         if tagtyp == ty_empty8
             read(infile, Int64)
             @printf(headerfile, "<Empty>")
@@ -67,17 +63,13 @@ function getheader(infile::IOStream, headername::String)
             tagint = read(infile, Int64)
             tagstring = strid(infile, tagint)
             @printf(headerfile, "%s", tagstring)
-            if tagidx > -1
-                evalname = tagident * "{" * string(tagidx + 1) * "}"
-            end
+            tagidx > -1 && evalname = tagident * "{" * string(tagidx + 1) * "}"
             merge!(tagdict, Dict(evalname => tagstring))
         elseif tagtyp == ty_widestring
             tagint = read(infile, Int64)
             tagstring = strid(infile, tagint)
             @printf(headerfile, "%s", tagstring)
-            if tagidx > -1
-                evalname = tagident * "{" * string(tagidx + 1) * "}"
-            end
+            tagidx > -1 && evalname = tagident * "{" * string(tagidx + 1) * "}"
             merge!(tagdict, Dict(evalname => tagstring))
         elseif tagtyp == ty_binaryblob
             tagint = read(infile, Int64)
